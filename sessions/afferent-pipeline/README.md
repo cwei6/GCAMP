@@ -31,7 +31,7 @@ This folder records the Cowork ("normal") Claude session that built and ran the 
 | Transferred range | every event after that boundary, 2026-11-03 18:58 to 2026-11-09 22:32 UTC (1,288 events, 7 user messages, 424 tool uses) |
 | Last event transferred | `de17a2f4-5101-46df-a716-72d3de4acc6f` at 2026-11-09T22:32:17.182883Z |
 
-There is a second compaction inside this range, at 2026-11-09 22:06:31 UTC. The transfer files do not contain its summary text or its event id. The events after it are covered by the digest. To re-sync, page the session's events forward from `de17a2f4-5101-46df-a716-72d3de4acc6f` (see the repo `CLAUDE.md`, "Re-syncing a Cowork session that is still running").
+There is a second compaction inside this range, at 2026-11-09 22:06:31 UTC (boundary event `b4075ccb-47ad-48af-89d6-a8b5780d00f9`, `compact_boundary`). Its summary text is in `compaction-summary-2026-11-09.md`; it covers Nov 3 up to the user's 22:03 tab-2 question. The events after it (the v45 fix and delivery, the export question) are covered by the digest. To re-sync, page the session's events forward from `de17a2f4-5101-46df-a716-72d3de4acc6f` (see the repo `CLAUDE.md`, "Re-syncing a Cowork session that is still running").
 
 ## Export requested from the session itself
 
@@ -48,6 +48,7 @@ The answer was not in the transcript at fetch time. When the export arrives, it 
 | File | What it is |
 |---|---|
 | `README.md` | This file: session facts, sync cursor, file index. |
+| `compaction-summary-2026-11-09.md` | **Newest summary.** The session's own cumulative summary written at the 2026-11-09 22:06 compaction: standing instructions, Nov 3–7 work (v43, v44, the Treg processing with `treg_prepare.py`, the tStart patch), files, errors and fixes, all user messages since Nov 3, and the then-unanswered tab-2 question. It predates v45. No emails or secrets were found. |
 | `compaction-summary.md` | Verbatim copy of the session's own cumulative summary written at the 2026-11-03 18:58 compaction (covers the work up to v42 and the CFU re-run at overlap 0.3). No emails or secrets were found, so nothing was removed. |
 | `user-messages.md` | The user's messages since that compaction, verbatim (7 messages, 2026-11-03 to 2026-11-09). |
 | `digest.md` | Dated, chronological digest of everything since the compaction: requests, builds (v43, v44, v45), results, decisions, problems and fixes, and the state at the end. |
