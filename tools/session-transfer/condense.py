@@ -106,7 +106,9 @@ def main():
             if tp == 'text':
                 txt = part.get('text', '')
                 if k == 'user':
-                    if txt.startswith('This session is being continued from a previous conversation'):
+                    k0 = txt.find('This session is being continued from a previous conversation')
+                    if 0 <= k0 < 600:  # may follow a short preamble tag
+                        txt = txt[k0:]
                         lines.append(f'\n### [{ts}] COMPACTION SUMMARY (verbatim)\n\n{txt}\n')
                         open(os.path.join(out, 'compaction_summary.md'), 'w').write(f'<!-- compaction summary written {ts} UTC -->\n\n' + txt)
                     elif synthetic or txt.startswith('[SYSTEM NOTIFICATION') or txt.startswith('<system-reminder>') or txt.startswith('<task-notification'):

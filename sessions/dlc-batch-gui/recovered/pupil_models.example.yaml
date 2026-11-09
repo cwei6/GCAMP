@@ -1,0 +1,24 @@
+# pupil_models.yaml - per-folder override of the camera -> model rule in DLC_batch_gui.py
+#
+# Put this file in a condition, animal or recording folder. The NEAREST file at or above a
+# recording folder is used; keys you leave out keep the default (shown here).
+# Values: frontal | angled | a path to another DLC config.yaml (or to its folder;
+# relative paths are relative to this file). A typo such as "angeld" is reported as
+# MODEL_MAP_ERROR in the scan instead of being silently ignored.
+#
+# Videos whose model comes from a pupil_models.yaml get a "*" in the GUI's Model column.
+
+eye: frontal            # *_eye.mj2 in recordings WITHOUT a *_face.mj2 (classic single camera)
+eye_with_face: frontal  # *_eye.mj2 in recordings that also have a *_face.mj2
+face: angled            # *_face.mj2
+
+# Examples
+# --------
+# Single-camera test runs where the angled camera was saved as *_eye
+# (used in GCAMP_visual_exp\visualstim_test\NavRearChr-2609-1):
+#   eye: angled
+#
+# Two-camera recordings where the cameras are the other way round
+# (e.g. the short 10/20 NavWT-2609-1 tests: _eye = angled side view, _face = frontal close-up):
+#   eye_with_face: angled
+#   face: frontal

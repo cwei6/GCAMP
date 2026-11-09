@@ -1,15 +1,15 @@
-# GCAMP lab analysis — Claude Code workspace
+# GCAMP lab analysis: Claude Code workspace
 
 This repo is the Claude Code home for work that was done in Cowork ("normal") Claude sessions.
-Each project has its own folder with a `HANDOFF.md` (context for a new session), `docs/` (project notes) and `code/`.
+Each project folder has a `README.md` index. Where available, it also has a `HANDOFF.md` (full context for a new session), `docs/` (notes and converted reports) and `code/`.
+Data never goes here: it stays on the lab PC samson. Read [`CLAUDE.md`](CLAUDE.md) first.
 
-| Folder | Project |
-|---|---|
-| `afferents/` | GCaMP two-photon imaging of trigeminal afferents (AQuA2 / afferent2p pipeline, Treg cohort) |
-| `gcamp/` | GCaMP visual experiments and other GCaMP imaging work |
-| `deeplabcut/` | Pupil / face DeepLabCut batch analysis |
-| `behavior/` | Behaviour pipelines (squint, Treg paradigm) |
-| `vasculature/` | Vasculature imaging |
-| `sessions/` | Index of the source Cowork sessions and their sync status |
-
-Transfer in progress.
+| Folder | Project | Handoff | Code |
+|---|---|---|---|
+| [`afferents/`](afferents/) | GCaMP two-photon imaging of trigeminal afferents: AQuA2 / `afferent2p`, RearChr optostim and Treg cohorts | ✅ | pending session export |
+| [`gcamp/`](gcamp/) | V1 GCaMP imaging pipeline and visual experiments | — (session not yet linked) | — |
+| [`deeplabcut/`](deeplabcut/) | Pupil DeepLabCut batch analysis (two-camera, frontal and angled models) | ✅ | export ready, pending publish |
+| [`behavior/`](behavior/) | Squint pipeline, Treg paradigm, NTG photophobia | ✅ | export ready, pending publish |
+| [`vasculature/`](vasculature/) | Vasculature imaging | — (session not yet linked) | — |
+| [`sessions/`](sessions/) | Source Cowork sessions: summaries, user messages, digests, sync cursors | | |
+| [`tools/session-transfer/`](tools/session-transfer/) | Scripts that turn session transcripts into readable text | | |
