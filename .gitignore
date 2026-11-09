@@ -1,0 +1,19 @@
+# Raw data and large outputs never go in this repo (it is public); they live on samson.
+*.tif
+*.tiff
+*.mat
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.mj2
+*.mp4
+*.avi
+*.zip
+*.pickle
+*.pkl
+__pycache__/
+*.pyc
+.DS_Store
+# local GUI settings written next to the scripts on samson
+*_settings.json
