@@ -1,3 +1,6 @@
+> **Newer source (10 Nov):** the user's own handoff from the old "Bahvior" claude.ai project is in [`docs/claude-project-handoff/`](docs/claude-project-handoff/).
+> It covers all six behavior chats and the current samson `CLAUDE.md`, and wins where it differs from this draft (e.g. the Treg openness reference uses both the ambient and the dark habituation blocks).
+
 > Draft built from the transcript of Cowork session 'DLC batch video analysis GUI' on 2026-11-09; the session's own export (branch cowork-export/dlc-behavior) will be merged in and supersedes it where they differ.
 > At capture the session had not yet written its own `behavior/HANDOFF.md`. This draft draws on its summary and on the samson files it read on 9 Nov (`CLAUDE.md`, `README.md`, `docs\project-history.md`, settings and paradigm files).
 
