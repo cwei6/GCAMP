@@ -1,0 +1,41 @@
+# NavRearChrTIGRE-2608-1 — full pipeline run (status, Oct 14 2026)
+
+Goal: pre vs post optostim change in afferent activity with running and pupil as controls. Animal folder `D:\2photon\Chao\GCAMP_affrerents\NavRearChrTIGRE-2608-1` on the server "samson" (seen as `Z:\2photon\Chao\GCAMP_affrerents\...` from the other PC), runs 1–4 pre / 5–8 post, FOV1 = odd runs, FOV2 = even runs.
+
+**Stimulation conditions per day (from the user):** 260831 = test run, no stimulation (one run, in `test_run\`, not analysed); **260917 = sham stimulation; 260911 = 2 Hz, 3.3 mW; 260921 = 2 Hz, max power; 261002 = 5 Hz (power not stated yet — ask; same paradigm, 8 runs, added Oct 13).** Always label results by condition. `NavRearChrTIGRE-2608-1\day_labels.csv` on samson carries these labels (updated Oct 13 with 261002 = "5 Hz").
+
+**Second RearChr animal NavRearChrTIGRE-2608-2** (conditions from the user, Oct 13): 260915 = 5 Hz, 3.3 mW; 260922 = sham; 261001 = 5 Hz, max power; the next day is planned as 2 Hz max power (not recorded yet). `NavRearChrTIGRE-2608-2\day_labels.csv` written Oct 13. Its three days are through the batch + CFU step (24/24 results, Oct 13 18:13Z at the Oct 13 `aqua_opts` settings: FOV1 thr 2.5 / minSize 50, FOV2 thr 3 / minSize 100) and the second tuning sweep (report Oct 14 19:31Z, no settings changed); the batch was rebuilt Oct 14 19:32Z with v32 (nothing queued); the analysis (tab 7) and the reports have NOT been run for 2608-2 yet. **FOV 2 has (almost) no events/CFUs on all three days — a false negative of the common setting (recall 0.00), see `claude/registration-review-and-motion-check.md`**; 261001_004 showed the non-fibre blobs that led to the "looks" column.
+
+## Where things stand (Oct 14)
+- Days 260911 / 260917 / 260921: AQuA2 + CFU results from Oct 2–3 (hand-chosen settings FOV1 thr 2 / minSize 100, FOV2 thr 2 / minSize 50); the Oct 6–7 tuning sweep's apply wrote `aqua_opts\<mouse>_<day>_FOV<k>_Opt.csv` (Oct 10) for these six experiments; a second sweep (270 jobs) was running on samson Oct 13–14 together with 2608-2's. Curation not done yet; analysis last run Oct 3 (v30 outputs); the v32/v33 analysis/report has NOT been run on samson yet (a v32 preview built in the cloud from the result files was sent Oct 13). This is the animal to run the new motion check on (runs 60–100 % of the time, hundreds of events).
+- **Day 261002 (5 Hz) is raw only** (`.sbx` 24 GB, `_quadrature.mat`, DLC eye csv per run) — not unpacked. Route: tab 1 Unpack (the new runs only; existing tiffs are skipped) → **▶ Run all (guided)**: batch (the new day's two experiments have no `aqua_opts` file, so they would get the root `FOV1/FOV2_Opt.csv`), the sweep runs only the new day's two movies (the old jobs are done), the report recomputes the common setting per FOV over all four days and — since the Oct 13 fix — rewrites only settings files whose values changed, so only the new runs go through AQuA2 unless the common setting itself moved; then analysis + both reports. Two MATLAB pastes.
+- v32 (Oct 13, `claude/pipeline-v32-report-redesign.md`): main report restructured (general representation first, heatmaps, locomotion-evoked activity), separate QC report, guided Run all, tabs 1–8.
+- v33 (Oct 14, `claude/registration-review-and-motion-check.md`): the curation window / reports / heatmaps use AQuA2's own registered movie (out of the `_AQuA2.mat`), panning after zoom, per-run motion & registration check (`motion_summary.csv`, QC columns/figure, warn chip when the event onsets follow the movement); the guided chain's stall rule also fires when results already existed at the first check. Package `afferent2p_v33\` + zip on samson, working copy updated.
+
+## Result (Oct 3) — report
+- Claude doc (figure + description per effect): https://claude.ai/code/artifact/539bda9a-c93f-4d1b-827f-3abec16d19ad (relabelled by condition Oct 3; locomotion-standardisation and time-course sections added Oct 6).
+- HTML on samson: `aqua_analysis\NavRearChrTIGRE-2608-1_report.html` (hand-built Oct 3–6), superseded by the pipeline's own report (v31/v32: tab 8).
+
+Final batch settings (both FOVs thrARScl 2, FOV1 minSize 100 px, FOV2 minSize 50 px, sigThr 3.5, sourceSensitivity 8, registrateCorrect 2, bleachCorrect 2; CFU min events 1).
+
+Per experiment (pre → post; events, rate): sham 260917_FOV1 0 → 0; sham 260917_FOV2 0 → 8 (0 → 0.26/min; mouse running pre, 50 % still post); 3.3 mW 260911_FOV1 5 → 1 (0.16 → 0.03/min, ×0.20); 3.3 mW 260911_FOV2 1 → 10 (0.03 → 0.33, ×10) — both 3.3 mW experiments with the mouse still 85 % pre and running post; max power 260921_FOV1 3 → 8 (0.10 → 0.26, ×2.7); **max power 260921_FOV2 51 → 144 (1.63 → 4.63/min, raw ×2.84; still-only ×18 (2–4 min), running-only ×2.3; Poisson-adjusted ×2.14, 95 % CI 1.13–4.66; common region ×2.76; active tiles 23 → 55; segments 4 up / 1 down of 19; CFUs 11/39/35/106 per run, none recurring in all 4; events longer (42 → 91 s) and lower (dF/F 0.34 → 0.25); pupil–activity coupling +0.4 pre → −0.3 post).** Only the max-power FOV2 supports a controlled conclusion; sham and 3.3 mW days have 0–10 events per condition and mismatched behaviour. Baseline rates of the same FOV differ >10× between days. **Caveat:** in 260921_002 most events sit on the vertical vessel-wall band next to the vessel crossing, and cfu_shape's "looks" rule flags 21 of 39 CFUs of 260921_004 and ~18 of 35 of 260921_006 as off-fibre — the max-power FOV2 effect may be partly vascular; curate (tab 6, "Select suggested") then tabs 7 + 8 again. The v33 motion check will say whether those events also follow the movement.
+
+v32 preview numbers (cloud, no movies): the animals run 60–100 % of the time → strict locomotion trials 0–2 per run, relaxed 1–15; 260921_FOV2 post: 10 relaxed trials, 10 % responsive (z rule), 2.4 events per trial vs 0.33 pre; loco-responsive CFUs 18 % pre and post; population GLM deviance explained 0.35 pre → 0.25 post (Loco2Fluor).
+
+## Done
+- Steps 1–2 (unpack + brightness flags, v29 `--force` Oct 1) on the 24 runs of the first three days; Steps 4–5 (batch + MATLAB, Oct 2–3; AQuA2 at H:\MATLAB\AQuA2-main); `_AQuA2_events.csv` / `_meanimg.tif` exist for all runs except 260917_001/003/004/005/007 (0 events, fine) and **260921_001/003 (missing although 001 has 3 events → tab 5 "CFU batch only", then tab 7)**.
+- Analysis (Oct 3, v30 outputs in `aqua_analysis\`); tuning sweep Oct 6–7 read Oct 10 (`claude/aqua-tune-first-real-sweep-results.md`), applied Oct 10 as per-experiment `aqua_opts` files (note: v31's stale rule did not re-queue the runs because the files predate… check the batch printout before trusting this).
+- Package locations on samson: **working copy `afferent2p\` (fixes written there directly)**, `afferent2p_v33\` + `afferent2p_v33.zip` (Oct 14), `afferent2p_v32\` + zip (Oct 13); older `_v31`, `_v30`, `_v29`.
+- Cloud mirror of the result files: `<scratchpad>/mirror/NavRearChrTIGRE-2608-1/` (v32 analysis + both reports reproduced there); 2608-2 260915_001/002 real movies + results in `<scratchpad>/qc2/NavRearChrTIGRE-2608-2/` (v33 tests).
+
+## Pending
+- Tell the pipeline 261002's power (3.3 mW or max) → `day_labels.csv`.
+- Tab 1 for 261002, then Run all (guided) → the new day joins the report (acute/chronic lines get a 4th day).
+- Run tab 7 + tab 8 (v33) on 2608-1 and 2608-2 → motion_summary.csv / QC motion columns for every run.
+- 2608-2 FOV 2: look at the sweep's sensitive settings in the curation window (overlay setting 1 or 4), then either per-day settings (untick the common-setting box before 4 Apply) or hand-edited FOV2 opt files → tab 4 → tab 5.
+- Curate the vessel-band CFUs (260921_004/006, "Select suggested") → tabs 7 + 8.
+- Re-run the CFU batch for 260921_001/003.
+- Second focused sweep (`--grid thrARScl=1.25,1.5,1.75,2 --grid maxSize=inf,1500 --grid minSize=50 --amplitudes 0.3,0.6,1.0 --sizes 200,400,800`) → decide thr 1.5 + maxSize vs thr 2.
+- Lab decision: which responsive-trial rule (yu / z / ev) is the headline.
+- Design for the next animal: pre and post in the same behavioural state; a sham day whose fields have a baseline comparable to the stimulation days.
+- Computer use of samson from the cloud failed before (black desktop capture) — do not retry; use device_list_dir / stage / commit.

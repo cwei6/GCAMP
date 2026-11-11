@@ -1,0 +1,138 @@
+# afferent2p configuration
+# Copy this file next to your data (or anywhere) and edit, then run:
+#   python run_pipeline.py my_config.yaml
+#
+# Only `experiment:` normally needs editing per experiment. Everything else has
+# sensible defaults for awake single-plane GCaMP afferent imaging.
+
+experiment:
+  name: Navcontrol-2504-1_250616          # used to name outputs
+  # Folder that contains the .sbx + .mat (+ .quad) files for this FOV/session.
+  # Subfolders are searched too, so it is fine if each run sits in its own folder.
+  data_dir: 'D:\2photon\Chao\GCAMP_visual_exp\old-200umfiber\Navcontrol-2504-1\Navcontrol-2504-1_250616_001'
+  # Runs in chronological order, each labeled pre (baseline) or post (after optostim).
+  # Give just the .sbx file name (searched for under data_dir).
+  # Leave as `auto` to auto-discover all .sbx files sorted by name; with exactly
+  # two runs, the first is labeled pre and the second post.
+  runs: auto
+  # runs:
+  #   - {sbx: Navcontrol-2504-1_250616_001_000.sbx, condition: pre}
+  #   - {sbx: Navcontrol-2504-1_250616_001_001.sbx, condition: post}
+  output_dir: null                         # null = <data_dir>/afferent2p_out
+
+imaging:
+  functional_chan: 1     # 1 = green PMT (GCaMP), 2 = red
+  register_on_red: auto  # some runs also record a red vascular tracer (channel 2).
+                         # auto = when EVERY run of the experiment has it, compute the
+                         # motion correction on the bright static vessels and apply it to
+                         # the GCaMP channel (much more reliable than aligning dim axons);
+                         # false = always align on green; true = require red
+  nplanes: 1             # single-plane for now
+  fs: null               # frames/s; null = read from sbx metadata
+  tau: 0.7               # indicator decay (s): GCaMP6f ~0.7, 6s ~1.25, jGCaMP8 ~0.2-0.4
+
+prealign:                 # inter-session alignment BEFORE suite2p (pre vs post, different days)
+  enabled: true           # estimate rotation + shift of each run onto the first run from the
+  max_angle_deg: 6        # structural image (red vessels if present, else green 10th pct);
+  min_shift_px: 2         # applied to the run's frames only if larger than these thresholds
+  min_angle_deg: 0.5      # (suite2p handles small translations itself, never rotation)
+
+registration:
+  nonrigid: true         # rigid + local (block) correction; set false for rigid-only
+  block_size: [128, 128]
+  maxregshift: 0.1       # max shift as fraction of frame size
+  batch_size: 200
+  smooth_sigma_time: 2   # temporal smoothing (frames) for ALIGNMENT only — essential
+                         # for dim/sparse axon data where single frames are all noise;
+                         # raise to 3-5 if registration shifts still look like noise
+  nimg_init: 1000        # frames used to build the reference image
+  torch_device: cpu      # 'cuda' if the analysis PC has an NVIDIA GPU
+
+roi_detection:            # axon-oriented suite2p settings (defaults are for somata)
+  enabled: true           # suite2p ROI detection + trace extraction + deconvolution
+  soma_crop: false        # keep elongated (axonal) ROIs
+  threshold_scaling: 0.8  # lower = more/dimmer ROIs (suite2p default 1.0)
+  spatial_scale: 1        # 1 = smallest spatial scale (thin axons / boutons)
+  denoise: true           # PCA-denoise the binned movie before detection (helps low SNR)
+  detection_bin_s: 1.0    # temporal binning used ONLY to find ROIs; traces stay full rate
+  highpass_time: 100      # frames; removes slow drift before detection
+  max_rois: 5000
+  dcnv_win_baseline_s: 30 # deconvolution baseline window (s)
+  save_mat: true          # also write Fall.mat (MATLAB-readable)
+
+export:
+  aqua_tifs: true        # write registered per-run tiffs (AQuA2 input)
+  chunk_frames: 4000     # frames written per write call (memory, not file splitting)
+  aqua_dtype: uint16     # uint16 = what MATLAB writes and what ImageJ/AQuA2 read
+  aqua_rate_hz: 1.0      # target frame rate of the AQuA tiff. Bin factor =
+                         # round(fs / rate), same rule as the MATLAB pipeline
+                         # (GenerateExptProjections): 15.62 Hz / 1 Hz -> 16 frames
+                         # averaged per output frame (0.976 Hz). Use the SAME
+                         # value for every recording you compare.
+  aqua_bin_t: 0          # 0 = derive from aqua_rate_hz; >1 = force this bin factor
+  aqua_crop: [80, 80, 40, 40]  # crop [L,R,T,B] px = MATLAB projParam.edge default
+
+loco:
+  enabled: true
+  quad_glob: '*quad*'    # pattern for the wheel/quadrature file within each run folder
+  quad_kind: cumulative  # 'cumulative' = encoder position per frame (differentiated); 'rate' = already a speed
+  counts_per_cm: null    # encoder calibration; null = velocities in counts/s
+  still_thresh: 5.0      # |velocity| below this = still (cm/s if calibrated; counts/s
+                         # otherwise — encoder jitter is ~2 counts/s, running is 40-90)
+  min_still_s: 5.0       # minimum quiet-period duration to count as "still"
+  smooth_s: 0.5          # velocity smoothing window
+
+pupil:                      # DeepLabCut eye tracking (<run>_eye_*DLC_*.csv next to the .sbx)
+  enabled: true
+  glob: '*eye*DLC*.csv'     # 'filtered' csv preferred if several match
+  likelihood_min: 0.6       # DLC likelihood below this = point not used
+  min_edge_points: 3        # centre + at least this many edge points, else frame = blink/NaN
+  max_gap_s: 0.5            # interpolate blink gaps up to this long
+  smooth_s: 0.25            # light smoothing of the diameter trace
+
+analysis:
+  enabled: true
+  neuropil_coeff: 0.7        # Fcorr = F - coeff * Fneu
+  baseline_percentile: 10    # moving-percentile baseline for dF/F
+  baseline_win_s: 32.0
+  event_z: 1.0               # event: z > event_z ...
+  event_min_dur_s: 1.0       #   ... for at least this long ...
+  event_min_dff: 0.05        #   ... and peak dF/F above this
+  loco_gate: still           # 'still' = compare pre/post during quiet wakefulness only; 'all' = whole recording
+  pupil_gate: none           # 'match' = additionally restrict both conditions to the overlapping
+                             # pupil-size range (10th-90th pct), i.e. compare at matched arousal
+  # ROIs -> afferents (fragments of one axon share a trace): hierarchical clustering
+  # of ROI traces (smoothed dF/F, still frames only). Blaeser et al. 2024 used a
+  # fixed r > 0.7 on high-SNR ROIs; at lower SNR the same-axon correlation is
+  # limited by noise, so 'auto' sets the threshold from a shuffle null instead.
+  cluster_r: auto            # 'auto' = max(cluster_r_min, 99.9th pct of shuffle null), or a number
+  cluster_r_min: 0.3         # floor for the auto threshold
+  cluster_smooth_s: 0.5      # Gaussian smoothing (s) of traces before correlating
+  cluster_max_dist_px: 0     # >0: never merge ROIs whose centroids are further apart (px)
+  cluster_min_still_s: 30    # need at least this much still data to cluster on still frames
+  # ROI curation (afferent filter). suite2p's classifier is soma-trained, so ROIs
+  # are judged by their RESPONSE PROFILE instead (analysis/roi_curation.png/.csv/.txt).
+  # Defaults live in afferent2p/curate.py; list a key here only to override it.
+  #   autocorr   : lag-1 autocorrelation of high-passed F-0.7Fneu (= suite2p stat 'snr'),
+  #                i.e. the fraction of variance that is temporally smooth; photon-noise
+  #                ROIs ~0.0-0.05, real afferents 0.1-0.7. 'auto' = max(0.05, median + 4
+  #                robust SD over all ROIs) = just above the noise bulk (0.07 on real data)
+  #   sig events : 0.5-s smoothed z > curate_sig_z_on for >= curate_sig_min_dur_s, peak
+  #                z >= curate_sig_z_peak (AQuA-like); lenient by default (>= 1)
+  #   red ratio  : ROI intensity in the red (tracer) mean image / surrounding annulus;
+  #                > curate_max_red_ratio = sits on a vessel -> rejected (needs chan 2)
+  #   npix       : size floor
+  #   optional (0 = off): asymmetry (transient shape), snr, skew, aspect, neuropil_r
+  # Each criterion gives a soft score (0.5 at threshold); ROI score = min -> written to
+  # iscell.npy[:,1], so the suite2p GUI probability slider at 0.5 reproduces this and
+  # higher = stricter. GUI curation always takes precedence on re-runs.
+  # Re-run only the filter:  python run_pipeline.py <cfg> --steps curate [--set analysis.curate_min_autocorr=0.1]
+  auto_curate: true
+  # curate_min_autocorr: auto      # or a number, e.g. 0.1
+  # curate_min_sig_events: 1
+  # curate_sig_z_on: 3.0
+  # curate_sig_z_peak: 4.0
+  # curate_sig_min_dur_s: 0.5
+  # curate_min_npix: 6
+  # curate_max_red_ratio: 2.0
+  # curate_min_asymmetry: 0.0

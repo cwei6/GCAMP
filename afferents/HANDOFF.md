@@ -1,6 +1,18 @@
-> Draft built from the transcript of Cowork session 'Afferent activity analysis pipeline' on 2026-11-09,
-> checked against the session's own cumulative summary of 2026-11-09 22:06 UTC and its project notes as quoted in the transcript;
-> the session's own export (branch cowork-export/afferents) will be merged in and supersedes it where they differ.
+> Written from the transcript of the Cowork session 'Afferent activity analysis pipeline' on 2026-11-09 by the
+> transfer session, then **checked and corrected by that Cowork session itself on 2026-11-10** (branch
+> `cowork-export/afferents`), which also exported its code, project notes and memory into this folder:
+>
+> | Where | What |
+> |---|---|
+> | `code/afferent2p/` | the `afferent2p` package **v45** exactly as delivered to samson (73 files; `pipeline_gui_settings.json` deliberately absent — it is the user's) |
+> | `code/drivers/` | `treg_prepare.py` (Nov 7 version), the generated MATLAB drivers `treg_sweeps_A.m` / `treg_sweeps_B.m` / `treg_aqua_all.m`, and `cfu_v41/` (the Nov 2 CFU re-run: `run_cfu_v41_all.m` + the three per-animal `run_cfu_batch_v41.m`) |
+> | `code/labels/<mouse>/` | the `run_labels.csv` / `day_labels.csv` written for the five Treg animals (the RearChr `day_labels.csv` live only on samson; their content is in section 2.1) |
+> | `code/analysis-scripts/` | scratch scripts behind delivered figures and checks: `curation_preview_2608-1.py`, `overlap_all.py`, `opt_threshold.py`, `opt_fig.py`, `overlap_fig.py`, `cfu_rules_fig.py`, `verify_v41.py` (they read files staged from samson under `/mnt/user-data/uploads/...`; adjust the paths) |
+> | `code/gui-render-tests/` | the Xvfb scripts that render the Tk GUI headless (`render_tab2b.py` reports every widget's size and whether Tk mapped it; `render_default.py`, `smoke_tab2.py`, `smoke2.py`) |
+> | `docs/project-notes/` | all 22 `claude/*.md` notes of the claude.ai project, verbatim (`v34-progress.md` = the master continuation notes, `treg-processing-nov3.md`, `cfu-rules-overlap-threshold-nov2.md`, …) |
+> | `docs/memory/` | the two project memory files (`gcamp-afferent-analysis.md`: the user's requests and decisions since Sep 2026, dated; `treg-project.md`) |
+>
+> Corrections made to the draft: the Python environment (section 3), the delivery/working-copy state of two files (section 6), the two "unresolved observations" (section 8, item 10), the export status (sections 7 and 8).
 
 # afferents: HANDOFF
 
@@ -78,8 +90,8 @@ Data root: **`D:\2photon\Chao\GCAMP_affrerents\`**. Note the spelling: "affreren
 | `D:\2photon\Chao\GCAMP_affrerents\afferent2p\` | **The working copy.** The user wants fixes written here directly. It is v45 (plus the v44 patches). |
 | `D:\2photon\Chao\GCAMP_affrerents\afferent2p_vNN\` + `afferent2p_vNN.zip` | Versioned packages. Zips `afferent2p_v22.zip` … `afferent2p_v45.zip`; folders only from `afferent2p_v29\` on (root listing of Nov 3 plus the v44/v45 deliveries). The working copy has been the place for fixes since Oct 6 (before that the user copied from `afferent2p_v30`). |
 | `D:\2photon\Chao\GCAMP_affrerents\afferent2p\pipeline_gui_settings.json` | **The user's GUI settings. Never deliver or overwrite it.** As of Nov 9 it holds: mouse `D:/2photon/Chao/GCAMP_affrerents/NavTIGRETreg-2608-1`, aqua `H:\MATLAB\AQuA2`, imagej `D:\ImageJ\ImageJ.exe`, matlab `C:\Program Files\MATLAB\R2021b\bin\matlab.exe`, um 0.792, border 5, sec 2, `b_opts` `…\afferent2p\default_Opt.csv`, `b_cfu_overlap` 0.3, `b_cfu_min` 1, `b_cfu_merge` 0.5, `b_cfu_aqua` '', auto_matlab false, t_common false, t_day_rule "matched sensitivity …". |
-| Cowork container (not reachable from Claude Code) | Working tree `/home/claude/afferent2p/` = v45 as delivered (its `pipeline_gui_settings.json` is a local test copy, never delivered); packages `/mnt/user-data/outputs/afferent2p_vNN/` + zip; `treg_prepare.py` source `/mnt/user-data/outputs/treg_driver/`; label-file sources `/mnt/user-data/outputs/treg_labels/`; files staged from samson under `/mnt/user-data/uploads/GCAMP_affrerents/`; test beds in the session scratchpad (`bed43/`, `bed44/`, `bed44b/`, `bedtreg/`, `bed45/`, `tab2/` render scripts). The export should come from there. |
-| This repo, `afferents/code/` | Does not exist yet; no pipeline code is in this repo. The session's export should bring the code here. |
+| Cowork container (not reachable from Claude Code) | Working tree `/home/claude/afferent2p/` = v45 as delivered (its `pipeline_gui_settings.json` is a local test copy, never delivered); packages `/mnt/user-data/outputs/afferent2p_vNN/` + zip; `treg_prepare.py` source `/mnt/user-data/outputs/treg_driver/`; label-file sources `/mnt/user-data/outputs/treg_labels/`; files staged from samson under `/mnt/user-data/uploads/GCAMP_affrerents/`; test beds in the session scratchpad (`bed43/`, `bed44/`, `bed44b/`, `bedtreg/`, `bed45/`, `tab2/` render scripts). The export in this folder came from there. |
+| This repo, `afferents/code/` | **The export of 2026-11-10** (see the table at the top): `code/afferent2p/` is v45 byte-for-byte as delivered to samson. Two files of the samson working copy are OLDER than the package: `legacy_register_run.m` (31,286 bytes, Oct 14, vs 33,902 here — the package version adds `sbx_info`, a double-precision Scanbox-info loader) and `reg_demo.py` (21,481 vs 21,893 — adds `--max-frames`); both are registration-comparison tools off the pipeline route, never written into the working copy at v33/v35. `afferent2p_v45\` on samson has the newer ones. |
 
 The package has 73 files.
 
@@ -96,9 +108,9 @@ Package `afferent2p\` (41 modules):
 
 `__init__`, `adjust`, `analyze`, `aqua_io`, `behavior`, `cfu_overlap`, `cfu_shape`, `compare`, `convert`, `curate`, `discover`, `export_aqua`, `fullreg`, `general`, `globalfix`, `heatmaps`, `labels`, `loco`, `locotrials`, `manual_roi`, `matlab_run`, `motion`, `pick`, `pipeline_state`, `plan`, `prealign`, `preview`, `pupil`, `pupil_coupling`, `qc`, `qc_report`, `register`, `report`, `reset`, `runbundle`, `spatial`, `statematch`, `stats`, `timecourse`, `triggers`, `tune`.
 
-### 2.3 Project docs and memory (in the claude.ai project, not in this repo)
+### 2.3 Project docs and memory (exported to `docs/project-notes/` and `docs/memory/`)
 
-claude.ai project `01a05a2b-e5f1-712c-9f39-83e753250429`, read with the Projects tool in Cowork. A Claude Code session cannot read these unless they are exported.
+Originals: claude.ai project `01a05a2b-e5f1-712c-9f39-83e753250429` (Projects tool in Cowork) and the Cowork memory store. The copies here are verbatim as of 2026-11-10 (the `claude/` prefix in cross-references = `docs/project-notes/`).
 
 | Doc | Content |
 |---|---|
@@ -136,7 +148,7 @@ Software:
 
 | Tool | Path / notes |
 |---|---|
-| Python | Anaconda at `C:\ProgramData\anaconda3` (the user says they use base Anaconda). On Nov 9 the running pipeline GUI process was `C:\ProgramData\anaconda3\envs\deeplabcut\python.exe`. A `deeplabcut` env exists; the transcript does not say which env the user activates. Also installed: Python 3.13 (user install) and Python 3.8. |
+| Python | **Base Anaconda** at `C:\ProgramData\anaconda3` (`python.exe` there; the session's computer-use grants resolved it as "Jupyter Notebook"). The pipeline is started from an Anaconda Prompt or `run_gui.bat`, which activates that base install. A `deeplabcut` env exists (`...\envs\deeplabcut\python.exe`) but it belongs to the user's other projects — on Nov 9 the only Tk window open on samson was their separate "squint — eyelid analysis pipeline" GUI, not afferent2p (the afferent2p GUI was not running). Also installed: Python 3.13 (user install) and Python 3.8. Packages: see `requirements.txt` (numpy, scipy, tifffile, scikit-image, pandas, matplotlib, h5py, Pillow; tkinter from Anaconda). |
 | MATLAB | **R2021b** `C:\Program Files\MATLAB\R2021b\bin\matlab.exe` (R2022b and R2025a also installed) |
 | AQuA2 | **`H:\MATLAB\AQuA2`** (mid-August 2026 copy, published CFU rules) on the mapped H: drive. UNC path: `\\its\ifs\users\cwei6\MATLAB\AQuA2`. Not used: `GCAMP_affrerents\AQuA2_2026-10`, `H:\MATLAB\AQuA-master`, and an old manifest's `H:\MATLAB\AQuA2-main`. |
 | ImageJ | `D:\ImageJ\ImageJ.exe` |
@@ -144,7 +156,7 @@ Software:
 How the user runs things:
 
 - **Pipeline GUI:**
-  - Open an **Administrator Anaconda Prompt** and start `pipeline_gui.py` from `D:\2photon\Chao\GCAMP_affrerents\afferent2p\`. The exact command line is not recorded in this period.
+  - Open an **Administrator Anaconda Prompt**, `cd D:\2photon\Chao\GCAMP_affrerents\afferent2p`, `python pipeline_gui.py` (that is all `run_gui.bat` does after activating base Anaconda). The user keeps several pipeline windows open at once, often of different versions.
   - Or double-click `afferent2p\run_gui.bat`, which activates base Anaconda (since v40).
   - The GUI has tabs 1–8; see section 4.
   - A window started before a code update keeps running the old code in memory. **Restart the GUI after every delivery.** v45 needs a restart.
@@ -367,12 +379,7 @@ Leftovers: NavTIGRETreg-2608-1 has an unused `FOV4_days_Opt.csv` and `aqua_tune`
 ## 7. In flight and next steps
 
 - **Nothing is running.** No MATLAB jobs and no scheduled check-ins as of 2026-11-09 22:32.
-- **Pending in the Cowork session:** the user's answer to the "GitHub export" question:
-  - export and push to branch `cowork-export/afferents` of `cwei6/GCAMP` (artifact fallback);
-  - export without pushing;
-  - skip.
-
-  When the export arrives, merge it here. It supersedes this draft, and its code should go to `afferents/code/`.
+- **The export is done** (the user chose "export and push" on 2026-11-10): this branch, `cowork-export/afferents`, holds the code, notes and memory described at the top. Nothing on samson was changed for it.
 - **User's next steps:**
   1. Restart the pipeline GUI to get v45. Check that tab 2 shows the check-the-recording row and the decision row.
   2. **Curate** in tab 6, one animal at a time (set the mouse field to each GCAMP_affrerents animal): the three RearChr animals (0/96) and the five Treg animals (0/63).
@@ -392,10 +399,10 @@ Leftovers: NavTIGRETreg-2608-1 has an unused `FOV4_days_Opt.csv` and `aqua_tune`
 
 ## 8. Open questions for the user
 
-1. GitHub export: push, zip only, or skip?
+1. ~~GitHub export: push, zip only, or skip?~~ Done — pushed as `cowork-export/afferents` (2026-11-10).
 2. Is the v45 tab-2 fix confirmed after restarting the GUI?
 3. Run a grid-extension round (RearChr about 10 h; Treg fields at the grid edge)?
-4. Rule-not-met Treg FOVs (no common setting keeps the on-fibre false-alarm share ≤ 10 % on every day): NavTIGRETreg-2609-2 FOV2 (42 / 11 / 12 / 64 % on Baseline / D5 / D7 / D9) and FOV3 (0 / 20 / 9 / 68 %), and NavTIGRETreg-2608-1 FOV2 (21 / 39 / 29 / 2 %). Accept the best trade-off and use false-alarm-corrected rates, re-tune, or exclude? Note also that NavTIGRETreg-2609-1 FOV1 (worst day 15 %) and NavTIGRETreg-2609-2 FOV4 (worst 12 %) were not labelled "rule not met" in the `--after` output although their worst-day share is above 10 %; the transcript does not explain why. A likely cause, not checked: the one-null-event grace of `is_clean()` (v38/v39, `GRACE_NULL_EVENTS`, when there are ≥ 4 real events), which can pass a setting whose single null event is more than 10 % of a small count.
+4. Rule-not-met Treg FOVs (no common setting keeps the on-fibre false-alarm share ≤ 10 % on every day): NavTIGRETreg-2609-2 FOV2 (42 / 11 / 12 / 64 % on Baseline / D5 / D7 / D9) and FOV3 (0 / 20 / 9 / 68 %), and NavTIGRETreg-2608-1 FOV2 (21 / 39 / 29 / 2 %). Accept the best trade-off and use false-alarm-corrected rates, re-tune, or exclude? Note also that NavTIGRETreg-2609-1 FOV1 (worst day 15 %) and NavTIGRETreg-2609-2 FOV4 (worst 12 %) were not labelled "rule not met" in the `--after` output although their worst-day share is above 10 %; the cause (confirmed in the code, `afferent2p/tune.py::is_clean`): the one-null-event grace of v38/v39 (`GRACE_NULL_EVENTS = 1`, applied when there are ≥ 4 real events) — a day with ONE null event among a handful of real ones still counts as clean, so 15 % (1 of ~7) and 12 % (1 of ~8) pass the common rule while 39–68 % (several null events) do not. The worst-day shares printed by `--after` are the raw ratios.
 5. Which responsive-trial rule to use for locomotion-evoked activity? Three rules are implemented; the lab has not chosen.
 6. Curate or exclude the vessel-band CFUs of 2608-1 260921_004/006?
 7. Should the motion-flagged post events of 2609-1 261025 (3 of 4 post runs had motion warnings) be reviewed?
@@ -406,9 +413,9 @@ Leftovers: NavTIGRETreg-2608-1 has an unused `FOV4_days_Opt.csv` and `aqua_tune`
    - NavTIGRETreg-2608-1's unused `FOV4_days_Opt.csv` and run-004 `aqua_tune` folders
    - `NavRearChrTIGRE-2608-2\aqua_tune\run_aqua_tune_b.m` and `tune_log_20261027_1807.txt` from the Oct 27 night sweep
 9. Normalise rates by fibre area per FOV? Mentioned in v31; not done.
-10. Two unresolved observations from the v45 work:
-    - In the smoke test, "Exclude whole stretch" did not change the displayed decision of stretch 25–31. The test bed was read-only symlinks, so this may be a test artefact; it was not checked.
-    - Sizes differ between the samson working copy and the cloud tree: `legacy_register_run.m` (31,286 vs 33,902 bytes) and `reg_demo.py` (21,481 vs 21,893 bytes). `afferent2p_v45\` on samson holds the cloud versions. The session's final progress doc (v45 section) says the samson files are "CRLF copies … content identical, left alone", but no check of this appears in the transcript, and the samson copies are the *smaller* ones (a CRLF copy of an LF file would be larger). Treat it as unverified; compare the files before relying on either.
+10. Both "unresolved observations" from the v45 work are resolved (checked by the Cowork session on 2026-11-10):
+    - The smoke-test decision that "did not change" was a test artefact: `globalfix.apply_decisions` needs the run's `_frames.csv`, which the test bed (symlinks to a few staged files) did not have, so it logged "no _frames.csv — run the brightness step first" and returned; the decision code is unchanged since v29 and works on samson.
+    - The two files were diffed: the samson working copy holds **older** versions (`legacy_register_run.m` without `sbx_info`; `reg_demo.py` without `--max-frames`), not CRLF copies — the progress doc's line was wrong and has been corrected in `docs/project-notes/v34-progress.md`. Both are registration-comparison tools off the pipeline route; copy them from `afferent2p_v45\` into the working copy only if those tools are used again.
 11. The repo's `sessions/docs/artifacts/work-todo-2026-11-02-project-items.md` lists an open to-do: "update the recording note for 2608-1 and 2608-2 … the 1101 recordings are 5 Hz, 10 ms width". This session's transcript does not mention a 261101 day, so it is unknown whether those recordings are on samson or in the pipeline.
 
 ---
@@ -470,4 +477,4 @@ Leftovers: NavTIGRETreg-2608-1 has an unused `FOV4_days_Opt.csv` and `aqua_tune`
 - `sessions/afferent-pipeline/user-messages.md`: the user's messages, Nov 3–9, verbatim.
 - `sessions/afferent-pipeline/digest.md`: chronological digest, Nov 3–9.
 - The project docs `claude/v34-progress.md` (Nov 3 version as read, plus the v44/v45 sections and continuation notes the session wrote on Nov 9), `claude/treg-processing-nov3.md` (Nov 5), `claude/pipeline-v31-treg-auto-report.md`, and the memory files, as read or written inside the transcript.
-- The session's own export (branch `cowork-export/afferents`), when it arrives, is authoritative.
+- This folder IS the session's own export (branch `cowork-export/afferents`, 2026-11-10); the sections above were checked by the session.

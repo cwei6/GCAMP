@@ -1,0 +1,41 @@
+# Segmentation tool options for afferent GCaMP (beyond AQuA2 and suite2p)
+
+Written Sep 17, 2026, after the real-data suite2p run returned ~4000 ROIs of mostly shot-noise speckle and the AQuA2 route proved parameter-sensitive. Companion to `claude/afferent-prepost-analysis-pipeline.md` and `claude/aqua2-gui-setup-notes.md`.
+
+## Framing the actual problem
+
+Neither AQuA2 nor suite2p is "wrong" for axons; both are being asked to do something they cannot do from the movie alone, which is to tell a dim fiber from a patch of photon noise. AQuA2 groups voxels that are active together, so noise that happens to co-fluctuate becomes an event; suite2p grows ROIs around local activity peaks with a soma-ish spatial prior, so noise that happens to peak becomes an ROI. The parameter tuning and manual correction are both downstream symptoms of one upstream fact: at 15.62 Hz on thin mCitrine-plus-GCaMP fibers, per-pixel SNR is low, and a detector with no prior about *where afferents are* has nothing to lean on. So the productive moves are (1) give the detector a spatial prior, (2) raise SNR before detection, or (3) use a detector whose prior is temporal-correlation rather than shape. They are independent and can be combined.
+
+One premise correction: AQuA2 is no longer astrocyte-specific. In Mi et al. (Cell 2025) the "A" stands for activity, and the paper demonstrates neurons, microglia, oligodendrocytes, dendritic/axonal signals in zebrafish, and non-calcium sensors (ATP, dopamine, ACh). Its real cost here is not that it is astrocyte software; it is that CFUs are event-defined spatial areas, not afferent identities, and event statistics are sensitive to threshold choices that must be frozen across pre and post.
+
+## Option 1 — structural fiber mask from mCitrine (cheapest, do first)
+
+The ReaChR-mCitrine tag is always on, so the pixelwise 10th-percentile projection is a structural image of the opsin-expressing afferents, independent of activity. Almost nobody imaging axons has this. A ridge/tubeness filter (Frangi vesselness) or an ilastik pixel classifier trained on a few brush strokes of "fiber" vs "background" converts it into a binary fiber mask. The mask can then be used either as a hard gate on the existing ~4000 suite2p ROIs (keep only ROIs whose pixels overlap the mask above some fraction) or as a detection restriction. Applied as a gate it is a few lines of code, needs no re-detection, and should remove most of the dark-corner speckle in one step, because noise ROIs sit where there is no structure. This was already the planned fallback in the pipeline notes; the real-data result argues for promoting it to the first filter, ahead of the trace-based criteria, since it is the only criterion that is not itself a threshold on noisy statistics.
+
+Caveat: it only finds afferents that express enough mCitrine to be visible, and it will include silent fibers, which is the correct denominator for "fraction of afferents that changed" but means the trace filter still has to run afterwards.
+
+## Option 2 — SpecSeg / SpectralSegmentation (the genuinely different algorithm)
+
+Levelt lab, Cell Reports Methods 2022, github.com/Leveltlab/SpectralSegmentation. Pixel traces are cut into one-minute windows, Fourier transformed, and the cross-spectral density of each pixel with its eight neighbors is computed in the 0.013–0.5 Hz band; pixels are grouped because they *fluctuate together at low frequency*, not because they look like a cell. With morphological constraints off it produces thin elongated contours, and the paper states the toolbox was tested and optimized for cell bodies, dendrites and axons.
+
+Why it fits this rig specifically: it reads Neurolabware .sbx natively (and motion-corrected TIFF, so the afferent2p registered exports work directly, preserving joint pre+post registration and one ROI identity across conditions); it ships a chronic-matching toolbox that aligns sessions by translation and rotation of the spectral images and then matches overlapping ROIs, which maps onto both the pre/post and the day -1/5/7/9 designs; and its documented failure mode is the opposite of the current one. On Neurofinder it scored only mid-range because it *skips* silent and noise-dominated ROIs — the authors show ground-truth ROIs often contain pixels with >85% of variance from noise, and SpecSeg declines them. Under-detection is much cheaper here than 4000 junk ROIs.
+
+Costs: MATLAB (Image Processing, Signal Processing, Statistics toolboxes; Parallel Computing optional), which cuts against the Python migration; last release v1.0.2, Sept 2022, so stable but not recently developed; still has a RoiManagerGUI curation step and threshold parameters that need adapting per preparation; and being activity-based it will miss afferents silent throughout the concatenated movie (joint pre+post detection mitigates this for anything active in either condition).
+
+Decisive test: run it on FOV1 260911, the same field where suite2p returned ~4015 ROIs with one confirmed afferent (ROI 3). If SpecSeg returns tens-to-low-hundreds of elongated ROIs that include that fiber, the junk problem is a suite2p detection artifact rather than something inherent to the data, and that settles the tool question with one afternoon of work.
+
+## Option 3 — denoise before detection (DeepCAD-RT or SUPPORT)
+
+DeepCAD-RT (Li et al., Nat Biotech 2022; github.com/cabooster/DeepCAD-RT) is self-supervised: it trains on the low-SNR data itself with no ground truth, so there is nothing to label. Needs an NVIDIA GPU and PyTorch, reads .tif, and claims imaging "beyond the shot-noise limit". SUPPORT (NICALab, Nat Methods 2023) is the same family with a statistically-unbiased-prediction objective designed to preserve fast per-frame signals; it was built for voltage imaging and is the safer choice if temporal fidelity is the worry. Either sits between registration and detection and improves whatever comes after, so it is orthogonal to the AQuA2-vs-suite2p-vs-SpecSeg choice.
+
+Mandatory caution: a denoiser can synthesize plausible transients. Before trusting it, detect on raw and denoised versions of the same movie and confirm event rates and per-afferent traces track each other; keep amplitude claims on raw data, or at minimum report both. Apply the identical model to pre and post, since an asymmetric denoiser would manufacture exactly the pre/post difference the experiment is testing.
+
+## Option 4 — SUBPREP (Python, confirms the current approach rather than replacing it)
+
+eNeuro 12(5), ENEURO.0565-24.2025. Python, sits on top of suite2p output. Three parts: FFT-based ROI screening that keeps ROIs with power in the transient band (the paper quotes roughly 0.03–0.13 Hz, exploiting that transient rise is faster than decay); z-motion artifact detection by PCA on all traces plus change-point detection on PC1; and hierarchical or k-means clustering of correlated ROIs into single axons or dendrites. This is essentially what `curate.py` and the afferent-clustering step in afferent2p already do, so adopting it wholesale would not remove tuning. Its value is as published precedent — the frequency-band screening criterion is a principled addition to the current autocorr + significant-transient filter, and the PCA/change-point z-motion detector is a better-specified version of the drift QC. Note the paper text does not print a repository URL; check the eNeuro data-availability statement.
+
+## Recommendation
+
+Structural mask first (Option 1), because it is the only step that adds information rather than another threshold. Then the SpecSeg trial on FOV1 (Option 2) as the decisive test of whether a correlation-based detector sees the field differently. Denoising (Option 3) only if both still leave the fiber traces marginal, and with the raw-vs-denoised check built in. Borrow SUBPREP's frequency-band criterion (Option 4) into `curate.py` rather than switching pipelines. Keep AQuA2 running in parallel on the colleague's binned route for comparability, not as the primary readout.
+
+Expectation to hold onto: none of these removes parameter tuning. What removes *manual correction* is a fixed, calibrated criterion applied identically to every session — which the iscell[:,1] score design already gets right — not a detector that needs no decisions.

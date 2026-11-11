@@ -1,0 +1,14 @@
+# afferent2p — Python packages (install into the Python you run the pipeline with):
+#   python -m pip install -r requirements.txt
+numpy
+scipy
+pandas
+matplotlib
+tifffile
+pillow           # check stacks (tab 1b); comes with matplotlib
+h5py
+scikit-image
+sbxreader        # only for unpack_bin.py (reading .sbx); not needed on a PC that only runs steps 3-6
+pyyaml           # only for the suite2p route (aqua_prep.py / run_pipeline.py)
+imageio          # reg_demo.py (the registration demo movie): mp4 writer
+imageio-ffmpeg   # idem (bundles ffmpeg); without both the GIF excerpt and the PNG are still written

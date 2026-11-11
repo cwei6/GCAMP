@@ -8,7 +8,7 @@ Each folder holds what was transferred from one Cowork ("normal") session:
 
 | Folder | Session | Projects | State at transfer (2026-11-09) | Code export |
 |---|---|---|---|---|
-| [`afferent-pipeline/`](afferent-pipeline/) | "Afferent activity analysis pipeline" (`session_01QvBfQetv2TTEfBpfqGr53o`), Aug 31 → now | afferents | Running; asking the user whether to export | Requested → `cowork-export/afferents`, awaiting user OK |
+| [`afferent-pipeline/`](afferent-pipeline/) | "Afferent activity analysis pipeline" (`session_01QvBfQetv2TTEfBpfqGr53o`), Aug 31 → now | afferents | Running | ✅ Imported 2026-11-11 from its private artifact "afferents export" into `afferents/` (code v45, 22 project notes, memory, HANDOFF) |
 | [`dlc-batch-gui/`](dlc-batch-gui/) | "DLC batch video analysis GUI" (`session_01TXsqNvay4sMGNwGK4XyuVe`), Sep 25 → now | deeplabcut, behavior | Idle; export built | 44 files committed as `11710ab` on `cowork-export/dlc-behavior` in its container; awaiting publish choice |
 
 | [`../behavior/docs/claude-project-handoff/`](../behavior/docs/claude-project-handoff/) | Old claude.ai project "Bahvior": 6 chats, summarised by the user's own handoff of 10 Nov | behavior | Chats closed; summarised | Code is on samson (`D:\Behavior\Chao\squint_pipeline`, `D:\Behavior\CPP_recorder`); squint code also in the DLC session's export |

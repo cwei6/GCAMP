@@ -1,0 +1,6 @@
+run,fov,condition,use,note
+NavTIGRETreg-2609-1_261010_001,1,d261010_pre,1,before the second injection
+NavTIGRETreg-2609-1_261010_002,2,d261010_pre,1,before the second injection
+NavTIGRETreg-2609-1_261010_003,,,0,first FOV1 post attempt - field shifted - replaced by 005
+NavTIGRETreg-2609-1_261010_004,2,d261010_post,1,after the second injection
+NavTIGRETreg-2609-1_261010_005,1,d261010_post,1,recapture of FOV1 after the second injection (FOV3 lost on this day)

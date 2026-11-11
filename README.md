@@ -6,7 +6,7 @@ Data never goes here: it stays on the lab PC samson. Read [`CLAUDE.md`](CLAUDE.m
 
 | Folder | Project | Handoff | Code |
 |---|---|---|---|
-| [`afferents/`](afferents/) | GCaMP two-photon imaging of trigeminal afferents: AQuA2 / `afferent2p`, RearChr optostim and Treg cohorts | ✅ | pending session export |
+| [`afferents/`](afferents/) | GCaMP two-photon imaging of trigeminal afferents: AQuA2 / `afferent2p`, RearChr optostim and Treg cohorts | ✅ (checked by the session) | ✅ `afferent2p` v45 + drivers |
 | [`gcamp/`](gcamp/) | V1 GCaMP imaging pipeline and visual experiments | — (session not yet linked) | — |
 | [`deeplabcut/`](deeplabcut/) | Pupil DeepLabCut batch analysis (two-camera, frontal and angled models) | ✅ | export ready, pending publish |
 | [`behavior/`](behavior/) | Squint pipeline, Treg paradigm, NTG photophobia | ✅ | export ready, pending publish |
