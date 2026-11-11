@@ -1,10 +1,10 @@
 # Behavior project: chats and what each one holds
 
-Written 10 Nov 2026 in the old Claude project "Bahvior" (the behavior project), for the move to Claude Code.
+Written 10 Nov 2026 (updated 11 Nov) in the old Claude project "Bahvior" (the behavior project), for the move to Claude Code.
 
 Claude Code can't open these chats because they live inside a claude.ai project. Everything that matters is summarised below or already saved on disk. The links are only for opening a chat in the Claude app if a detail is missing.
 
-Next to this file are the project's two notes, copied as they were: `squint-pipeline-status.md` (1 Oct) and `cpp-recorder.md` (12 Oct). The project had no custom instructions, no uploaded files and no scheduled tasks.
+Next to this file are the project's three notes, copied as they were: `squint-pipeline-status.md` (1 Oct), `cpp-recorder.md` (12 Oct) and `facial-von-frey-0.1NTG.md` (11 Nov). The project had no custom instructions, no uploaded files and no scheduled tasks.
 
 ## The chats
 
@@ -14,8 +14,9 @@ Next to this file are the project's two notes, copied as they were: `squint-pipe
 | 2 | [Camera control GUI for tablet](https://claude.ai/chat/d4470f26-ae56-4f22-a049-c23986bfde91) | 6–12 Oct 2026 | CPP recording: web recorder + tablet webcam decision | `D:\Behavior\CPP_recorder` |
 | 3 | [DLC model training status](https://claude.ai/chat/8491e557-92f6-42bd-aaf0-5a1782cde7fe) | 1 Oct 2026 | Checked the squint DLC retraining, then evaluation | `D:\Behavior\Squint_8P_ispi` |
 | 4 | [DeepLabCut Qt bindings error](https://claude.ai/chat/60ea074f-2a72-49dd-a1a8-bbf35c746fc1) | 25 Sep 2026 | Fixed DLC GUI / labeling errors on Windows | none (install fixes below) |
-| 5 | [Von Frey hindpaw plot](https://claude.ai/chat/4de76a70-0854-4791-b7c0-c822b1477675) | 4 Nov 2026 | Pre/post figure, Control vs NTG 10 mg/kg | only in the chat |
+| 5 | [Von Frey hindpaw plot](https://claude.ai/chat/4de76a70-0854-4791-b7c0-c822b1477675) | 4 and 11 Nov 2026 | Hindpaw figure (NTG 10 mg/kg); facial von Frey after 0.1 mg/kg NTG, SUDO-scored | only in the chat; rules in `facial-von-frey-0.1NTG.md` |
 | 6 | [White light lux threshold photophobia](https://claude.ai/chat/d7d75c93-c2a0-470e-8960-adb66e97539e) | 29 Sep 2026 | Literature review (no code) | none |
+| 7 | [Facial Von Frey method comparison](https://claude.ai/chat/da80fb54-caaf-462f-9cd8-202f746b4d58) | 10 Nov 2026 | SUDO vs Chaplan for facial von Frey (no code) | none |
 
 Related work kept elsewhere:
 
@@ -65,7 +66,9 @@ Fixes for DeepLabCut 3.0.0rc13 on Windows (conda env `deeplabcut`, working folde
 - napari `TypeError: object.__init__() takes exactly one argument` when labeling: napari 0.4.18 clashes with a newer PySide6. Fix: `pip install "pyside6==6.4.2"` (Python 3.11 or older).
 - Harmless warnings: `QPixmap::scaled: Pixmap is a null pixmap` and the napari-console npe2 schema warning. Labels save as `CollectedData_<name>.h5`.
 
-## 5. Von Frey hindpaw plot (4 Nov 2026)
+## 5. Von Frey hindpaw plot (4 Nov 2026, continued 11 Nov)
+
+Hindpaw figure, 4 Nov:
 
 - Input was an Excel workbook attached in the chat, with column D = 50 % threshold per mouse. The unlabeled top block was taken as pre and the "post" block as post.
 - Groups: NavWT-L + WT-L = Control; NavWT-R + WT-R = NTG 10 mg/kg.
@@ -73,6 +76,13 @@ Fixes for DeepLabCut 3.0.0rc13 on Windows (conda env `deeplabcut`, working folde
 - Results: NTG 0.43 → 0.21 g (−51 %, both mice down); Control 0.73 → 0.56 g (−24 %, mostly one mouse).
 - Figure: paired pre/post per group (mean bars + one line per mouse, marker = genotype), as a 300 dpi PNG and a PDF with editable text (`pdf.fonttype 42`, Arial-metric font). Colours were matched to the slide deck: Control `#111111`, NTG `#e3261b`, open outlined bars, genotype key in grey.
 - Not on disk: the script (`plot.py`) and `hindpaw_von_frey_NTG.png` / `.pdf` exist only in that chat. Offered but not made: a percent-of-baseline panel.
+
+Facial von Frey after 0.1 mg/kg NTG, 11 Nov. Scoring rules, findings and output names are in `facial-von-frey-0.1NTG.md` (this folder).
+
+- Input: `Facial_von_Frey.xlsx`, attached in the chat (sheets 260729-0.1NTG-1stbatch, 260805-0.1NTG-2ndbatch and 261110-0.1NTG).
+- Decisions: score every series with SUDO (Chaplan series too, from their first 5 pokes), report % change, and leave out mice with a baseline under 0.07 g. With the 0.07 g start, SUDO can't score above 1.18 g.
+- Findings: no 0.1 mg/kg NTG effect in the new setup (261110: Vehicle −7 %, DT −4 %, p = 0.89). In the previous setup (260729 + 260805) all 8 mice dropped, mean −45 % (p = 0.008). The two setups also differ in baseline (median 0.14 vs 0.62 g). Setup is confounded with batch and with the vehicle/DT pretreatment.
+- Not on disk: the scoring code, the figures (`facial_von_frey_0.1NTG_pct_change` and `facial_von_frey_0.1NTG_baseline_distribution`, PNG + PDF) and `facial_von_frey_0.1NTG_per_mouse.csv` exist only in that chat.
 
 ## 6. White light lux threshold photophobia (29 Sep 2026)
 
@@ -82,3 +92,13 @@ Literature review on the light levels behind the squint paradigms (no code).
 - Papers measure at the floor, not at the eye. Under overhead light the eye gets roughly half the floor value. A 2025 Kaiser/Aguirre preprint was the only source found with photopic and melanopic lux and a dose–response.
 - For Treg: ambient room light (~100–1,000 lux) is below the aversion threshold for unsensitized wild-type mice, so squinting in the ambient blocks is more likely nociceptive than photophobic. A dark-to-light step (~1,000 lux) closes the eyelid even in naive mice, which matters at block boundaries.
 - Offered but not made: a methods paragraph or a reference list.
+
+## 7. Facial Von Frey method comparison (10 Nov 2026)
+
+Method review, no code. Its conclusions shaped the scoring in section 5.
+
+- SUDO (Bonin, Bories & De Koninck, Mol Pain 2014) uses five pokes and reads the threshold from the fifth, moved half a step. It matched Chaplan's up-down closely, but was validated only on the paw. On the face it is defensible but not proven; other groups have used it periorbitally.
+- Risks on the face: responses are noisier (the filament is visible and can touch whiskers), and thresholds far above the starting filament hit SUDO's ceiling.
+- To make it defensible: a pilot that scores the same full Chaplan sequences both ways and checks agreement, not just correlation; responses defined in advance; approach from outside the visual field; a blinded tester; analysis in log units. Mason et al.'s periorbital protocol (Dixon up-down from 0.07 g) is a template.
+- One SUDO sequence per mouse per time point is enough. If two are averaged, use the same rest gap every time. Labs that repeat baselines spread them over separate days.
+- Chaplan vs SUDO: Chaplan counts six responses from the first change in response (4–9 pokes in total) and scores with Dixon's k table; SUDO always stops at 5 pokes and needs no table.

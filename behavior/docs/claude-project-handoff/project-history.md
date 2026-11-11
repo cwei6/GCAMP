@@ -54,3 +54,5 @@ Chat-by-chat summaries with links: `docs\claude_notes\behavior\SESSIONS.md`.
 ### Other behavior work
 - 29 Sep: literature summary on the light levels behind migraine-like photophobia in mice (no code).
 - 4 Nov: von Frey hindpaw figure, Control vs NTG 10 mg/kg (the script exists only in the chat).
+- 10 Nov: method review of SUDO vs Chaplan for facial von Frey (no code).
+- 11 Nov: facial von Frey after 0.1 mg/kg NTG, all three batches scored with SUDO as % change, baselines under 0.07 g left out. No effect in the new setup; −45 % in the previous one. Details in `docs\claude_notes\behavior\facial-von-frey-0.1NTG.md` (scripts and outputs only in the chat).
